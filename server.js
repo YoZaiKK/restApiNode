@@ -2,7 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 
 const app = express();
-const products = [{ id: 1, name: "Motor", price: 200 }];
+let products = [{ id: 1, name: "Motor", price: 200 }];
 const PORT = 3000;
 app.listen(PORT);
 
@@ -13,20 +13,48 @@ app.use(express.json());
 app.get("/products", (req, res) => {
 	res.json(products);
 });
+
 app.post("/products", (req, res) => {
 	const newProduct = { ...req.body, id: products.length + 1 };
 	products.push(newProduct);
-	res.send("Creando productos");
+	res.send("Creando producto");
 });
-app.put("/products", (req, res) => {
-	res.send("Actualizando productos");
+
+app.put("/products/:id", (req, res) => {
+	const newData = req.body;
+	const productFound = products.find(
+		(product) => product.id === parseInt(req.params.id)
+	);
+	if (!productFound)
+		return res.status(404).send({ message: "Product not found" });
+	products = products.map((product) =>
+		product.id === parseInt(req.params.id)
+			? { ...product, ...newData }
+			: product
+	);
+	res.send({ message: "Product updated successfully" });
+	// res.send(products);
+	// res.send("Actualizando productos");
 });
-app.delete("/products", (req, res) => {
-	res.send("Eleiminando productos");
+
+app.delete("/products/:id", (req, res) => {
+	const productFound = products.find(
+		(product) => product.id === parseInt(req.params.id)
+	);
+	if (!productFound)
+		return res.status(404).send({ message: "Product not found" });
+	products = products.filter(
+		(product) => product.id !== parseInt(req.params.id)
+	);
+	res.send({ message: "Product deleted successfully" });
+	// res.send(productFound);
+	// res.send("Eliminando productos");
 });
+
 app.get("/products/:id", (req, res) => {
-	const productFound = products.find((product) => product.id == req.params.id);
-	// console.log((productFound)?productFound: 'No se encontró producto');
+	const productFound = products.find(
+		(product) => product.id === parseInt(req.params.id)
+	);
 	if (!productFound)
 		return res.status(404).send({ message: "Product not found" });
 	res.send(productFound);
