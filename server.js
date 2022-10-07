@@ -3,12 +3,15 @@ const morgan = require("morgan");
 
 const app = express();
 let products = [{ id: 1, name: "Motor", price: 200 }];
-const PORT = 3000;
-app.listen(PORT);
+// Settings
+app.set('appName', 'Express API')
+app.set('case sensitive routing', true)
+app.set('PORT', 3000)
+
+app.listen(app.get('PORT'));
 
 app.use(morgan("dev"));
-app.use(express.json());
-// app.use(express.text());
+app.use(express.json()); 
 
 app.get("/products", (req, res) => {
 	res.json(products);
@@ -60,4 +63,4 @@ app.get("/products/:id", (req, res) => {
 	res.send(productFound);
 });
 
-console.log(`server on port ${PORT}`);
+console.log(`${app.get('appName')} on port ${app.get('PORT')}`);
